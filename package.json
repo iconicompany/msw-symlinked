@@ -1,0 +1,14 @@
+{
+  "name": "msw-symlinked",
+  "version": "1.0.0",
+  "description": "Custom response resolver based on stub files for MSW",
+  "main": "index.js",
+  "author": "Maxim Kuznetsov <github@maximumquiet.cyou>",
+  "license": "SEE LICENCE IN LICENCE",
+  "dependencies": {
+    "file-type": "^18.5.0"
+  },
+  "peerDependencies": {
+    "msw": "^1.2.2"
+  }
+}
