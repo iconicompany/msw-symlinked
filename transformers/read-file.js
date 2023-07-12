@@ -1,5 +1,5 @@
 import fs from "fs";
-import { fileTypeFromBuffer } from "file-type";
+import mime from 'mime-types';
 import { compose, context } from "msw";
 
 /**
@@ -7,14 +7,14 @@ import { compose, context } from "msw";
  * @param {string} path - The path of the file to be read.
  * @returns A composed response context object with the file data and relevant headers.
  */
-export const readFile = async (path) => {
+export const readFile = (path) => {
   const file = fs.readFileSync(path);
-  const fileType = await fileTypeFromBuffer(file);
+  const fileType = mime.lookup(path);
   return compose(
       context.set(
           {
             "Content-Length": file.byteLength.toString(),
-            "Content-Type": fileType?.mime ?? "application/json"
+            "Content-Type": fileType ? fileType : "application/json"
           }
       ),
       context.body(file)
