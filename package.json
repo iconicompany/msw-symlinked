@@ -1,6 +1,6 @@
 {
   "name": "msw-symlinked",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Custom response resolver based on stub files for MSW",
   "main": "index.js",
   "author": "Maxim Kuznetsov <github@maximumquiet.cyou>",
