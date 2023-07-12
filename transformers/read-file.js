@@ -8,7 +8,7 @@ import { compose, context } from "msw";
  * @returns A composed response context object with the file data and relevant headers.
  */
 export const readFile = (path) => {
-  const file = fs.readFileSync(path);
+  const file = fs.readFileSync(fs.realpathSync(path));
   const fileType = mime.lookup(path);
   return compose(
       context.set(
