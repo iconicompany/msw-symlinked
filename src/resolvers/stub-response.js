@@ -1,7 +1,7 @@
 import fs from "fs";
 import { compose, context, createResponseComposition } from "msw";
 
-import { readFile } from "../transformers/read-file";
+import { readFile } from "../transformers/read-file.js";
 
 /**
  * Stub a response using a file-based stub with optional variants.
