@@ -18,13 +18,13 @@ import { readFile } from "../transformers/read-file.js";
  */
 export const stubResponse = (stub, variants = {}) => {
   return createResponseComposition(null, [readFile(stub), (res) => {
-    const symlinkedPath = fs.realpathSync(stub);
-    const pathElements = symlinkedPath.split('.');
+    const symlinkedStub = fs.realpathSync(stub).split('/').pop();
+    const pathElements = symlinkedStub.split('.');
     let status = 200, variant;
-    if (pathElements.length === 4) {
-      [status, variant] = symlinkedPath.split(".").slice(-2);
-    } else if (pathElements.length === 5) {
-      [status, variant] = symlinkedPath.split(".").slice(-3);
+    if (pathElements.length === 3) {
+      [status, variant] = symlinkedStub.split(".").slice(-2);
+    } else if (pathElements.length === 4) {
+      [status, variant] = symlinkedStub.split(".").slice(-3);
     } else {
       throw new Error(`Unsupported stub path format : ${stub}`)
     }
