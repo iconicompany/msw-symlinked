@@ -22,12 +22,12 @@ export const stubResponse = (stub, variants = {}) => {
     const pathElements = symlinkedStub.split('.');
     let status = 200, variant;
     if (pathElements.length === 3) {
-      [status, variant] = symlinkedStub.split(".").slice(-2);
+      [status] = symlinkedStub.split(".").slice(-2);
     } else if (pathElements.length === 4) {
       [status, variant] = symlinkedStub.split(".").slice(-3);
     } else {
       throw new Error(`Unsupported stub path format : ${stub}`)
     }
-    return variant in variants ? compose(context.status(Number(status)), ...variants[variant])(res) : res;
+    return variant in variants ? compose(context.status(Number(status)), ...variants[variant])(res) : compose(context.status(Number(status)))(res);
   }])();
 };

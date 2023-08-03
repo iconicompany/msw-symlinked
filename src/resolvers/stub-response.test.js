@@ -18,9 +18,9 @@ describe("stubResponse", () => {
     const result = await stubResponse(stub);
 
     expect(fs.realpathSync).toHaveBeenCalledWith(stub);
-    expect(fs.realpathSync).toReturnWith(path.resolve('./test/resources/goodresponse.200.xml'))
+    expect(fs.realpathSync).toReturnWith(path.resolve('./test/resources/goodresponse.204.xml'))
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(204);
     expect(result.body.toString()).toBe('<test></test>')
     expect(result.headers.get('content-type')).toBe('application/xml')
   });
