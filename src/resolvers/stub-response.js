@@ -1,7 +1,7 @@
 import fs from "fs";
-import { compose, context, createResponseComposition } from "msw";
 
 import { readFile } from "../transformers/read-file.js";
+import {HttpResponse} from "msw";
 
 /**
  * Stub a response using a file-based stub with optional variants.
@@ -16,18 +16,27 @@ import { readFile } from "../transformers/read-file.js";
  * For example, a valid stub file name could be "agents.200.SUCCESS.json" for a JSON response with a status code of 200.
  * The optional variants object allows you to define different response variations based on the "{variant}" part of the file name.
  */
-export const stubResponse = (stub, variants = {}) => {
-  return createResponseComposition(null, [readFile(stub), (res) => {
-    const symlinkedStub = fs.realpathSync(stub).split('/').pop();
-    const pathElements = symlinkedStub.split('.');
-    let status = 200, variant;
-    if (pathElements.length === 3) {
-      [status] = symlinkedStub.split(".").slice(-2);
-    } else if (pathElements.length === 4) {
-      [status, variant] = symlinkedStub.split(".").slice(-3);
-    } else {
-      throw new Error(`Unsupported stub path format : ${stub}`)
-    }
-    return variant in variants ? compose(context.status(Number(status)), ...variants[variant])(res) : compose(context.status(Number(status)))(res);
-  }])();
+export const stubResponse = async (stub, variants = {}) => {
+  const { file, headers } = await readFile(stub);
+  const symlinkedStub = fs.realpathSync(stub).split('/').pop();
+  const pathElements = symlinkedStub.split('.');
+  let status = 200, variant;
+  if (pathElements.length === 3) {
+    [status] = symlinkedStub.split(".").slice(-2);
+  } else if (pathElements.length === 4) {
+    [status, variant] = symlinkedStub.split(".").slice(-3);
+  } else {
+    throw new Error(`Unsupported stub path format : ${stub}`)
+  }
+
+  const responseOptions = {
+    status: Number(status),
+    headers
+  }
+
+  if (variant in variants) {
+    responseOptions.headers = { ...responseOptions.headers, ...variants[variant].headers }
+  }
+
+  return new HttpResponse(file, responseOptions);
 };

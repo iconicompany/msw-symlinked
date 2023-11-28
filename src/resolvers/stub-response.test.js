@@ -2,7 +2,6 @@ import fs from "fs";
 import {stubResponse} from "./stub-response";
 import {afterEach, describe, expect, it, jest} from '@jest/globals'
 import path from "path";
-import {context} from "msw";
 
 describe("stubResponse", () => {
   it("should stub a response using a file-based stub", async () => {
@@ -18,20 +17,22 @@ describe("stubResponse", () => {
     const result = await stubResponse(stub);
 
     expect(fs.realpathSync).toHaveBeenCalledWith(stub);
-    expect(fs.realpathSync).toReturnWith(path.resolve('./test/resources/goodresponse.204.xml'))
+    expect(fs.realpathSync).toReturnWith(path.resolve('./test/resources/goodresponse.201.xml'))
 
-    expect(result.status).toBe(204);
-    expect(result.body.toString()).toBe('<test></test>')
+    expect(result.status).toBe(201);
+    expect(await new Response(result.body).text()).toBe('<test></test>')
     expect(result.headers.get('content-type')).toBe('application/xml')
   });
 
   it("should stub a response using a file-based stub using custom variant", async () => {
     jest.spyOn(fs, 'realpathSync')
-    const successVariant = [context.set('test', 'test')];
-
     const stub = "./test/resources/badresponse";
     const variants = {
-      ERROR: successVariant,
+      ERROR: {
+        headers: {
+          test: "test"
+        }
+      },
     };
     const result = await stubResponse(stub, variants);
 
@@ -39,7 +40,7 @@ describe("stubResponse", () => {
     expect(fs.realpathSync).toReturnWith(path.resolve('./test/resources/badresponse.500.ERROR.json'))
 
     expect(result.status).toBe(500);
-    expect(result.body.toString()).toBe('{"error":"test"}')
+    expect(await new Response(result.body).json()).toEqual({"error":"test"})
     expect(result.headers.get('test')).toBe('test')
     expect(result.headers.get('content-type')).toBe('application/json')
   });
